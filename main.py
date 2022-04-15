@@ -74,7 +74,7 @@ brain.gen_data()
 # GUI
 tk.Label(setting1, font=("Calibri", 15, "bold"), text="Number of points:", bg="#F0FFF0").pack(side='left', padx=5)
 tk.Entry(setting1, width=5, textvariable=points_num).pack(side='left')
-btn = tk.Button(setting1, font=("Calibri", 12, "bold"), text='Generate Points', command = brain.gen_data)
+btn = tk.Button(setting1, font=("Calibri", 12, "bold"), text='Generate points', command = brain.gen_data)
 btn.pack(side='left', padx=(10, 5), pady=5)
 btn = tk.Button(setting1, font=("Calibri", 12, "bold"), text='Start finding convex hull', command = brain.start)
 btn.pack(side='left', padx=(5, 10), pady=5)
