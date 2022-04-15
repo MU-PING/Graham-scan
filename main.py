@@ -7,11 +7,19 @@ Created on Tue Nov 24 22:02:29 2020
 import matplotlib.pyplot as plt
 import numpy as np
 import tkinter as tk
-
 from tkinter import ttk 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib import animation
 
+class PointNode():
+    
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        
+    def setAngle(self, x, y, angle):
+        self.angle = angle
+        
 class Graham_scan():
     
     def __init__(self):
@@ -26,11 +34,11 @@ class Graham_scan():
         plt.xlim(-1200, 1200)
         plt.ylim(-1200, 1200)
         
-        for _ in range(points_num.get()): #群數
+        for _ in range(points_num.get()): # 點數
             center_x = np.random.randint(-600, 600)
             center_y = np.random.randint(-600, 600)
-            self.points.append([center_x, center_y])
-            plt.plot(center_x, center_y, 'o', ms=5 , color = 'gray', alpha=1) #畫圖 ms：折點大小
+            self.points.append(PointNode(center_x, center_y))
+            plt.plot(center_x, center_y, 'o', ms=5 , color = 'gray', alpha=1) # 畫圖 ms：折點大小
            
         canvas.draw()
         
@@ -41,7 +49,7 @@ class Graham_scan():
         
     def init(self): 
         pass
-    def update(self, i): #2維資料更新參數
+    def update(self, i): # 2維資料更新參數
         pass
     def frames(self): # 禎數生成器
         pass
