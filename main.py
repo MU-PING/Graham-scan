@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import tkinter as tk
 
+from tkinter import ttk 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib import animation
 
@@ -58,8 +59,10 @@ points_num.set(15)
 # tk Frame
 setting1 = tk.Frame(window, bg="#F0FFF0")
 setting1.pack(side='top', pady=10)
+separator = ttk.Separator(window, orient='horizontal')
+separator.pack(side='top', fill=tk.X)
 setting2 = tk.Frame(window)
-setting2.pack(side='top')
+setting2.pack(side='top', pady=10)
 
 # Plot
 fig = plt.figure(figsize=(8,8))
