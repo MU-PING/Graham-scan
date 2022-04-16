@@ -17,15 +17,21 @@ class PointNode():
     def __init__(self, x, y):
         self.x = x
         self.y = y
+        self.degree = None
+        self.plot = None
         
     def setDegree(self, degree):
         self.degree = degree
+        
+    def setPlot(self, plot):
+        self.plot = plot
         
 class Graham_scan():
     
     def __init__(self):
         self.startpoint = None
-        self.points = []  # all pooints except startpoint
+        self.points = None
+        self.stack = [] # record convex hull points
         
     def gen_data(self):
         
@@ -38,9 +44,8 @@ class Graham_scan():
         plt.ylim(-1200, 1200)
         
         # generate points--------------------------------------------
-        tempPoints = []
         tempY = 600
-        
+        self.points = []
         for _ in range(points_num.get()): # number of points
             centerX = np.random.randint(-1000, 1000)
             centerY = np.random.randint(-1000, 1000)
@@ -50,38 +55,42 @@ class Graham_scan():
                 tempY = centerY
                 self.startpoint = point
                 
-            tempPoints.append(point)   
-        tempPoints.remove(self.startpoint)    
+            self.points.append(point)   
         
-        # count degree and sort by angle------------------------
-        for point in tempPoints:
-            degree = math.degrees(math.atan2(point.y - self.startpoint.y, point.x - self.startpoint.x))
-            point.setDegree(degree)
-        
-        self.points = sorted(tempPoints, key = lambda point: point.degree)
-        self.points.insert(0, self.startpoint)
-        
-        # make plot--------------------------------------------
-        for index in range(len(self.points)):
+        # make points--------------------------------------------
+        self.stack = [plt.plot(point.x, point.y, 'o', ms=5 , color = '#1f77b4', alpha=1)]
+        for index in range(points_num.get()):
             point = self.points[index]
             plt.plot(point.x, point.y, 'o', ms=5 , color = '#1f77b4', alpha=1) # ms: point size        
-            plt.text(point.x+35, point.y-20, str(index+1))
         canvas.draw()
-        
         
     def start(self):   
         ani = animation.FuncAnimation(fig=fig, func=self.update, frames=self.frames, init_func = self.init, interval=1200, blit=False, repeat=False) #動畫
         canvas.draw()
         
     def init(self): 
-        pass
- 
         
+        # calculate degree and sort by degree------------------------
+        self.points.remove(self.startpoint)  
+        for point in self.points:
+            degree = math.degrees(math.atan2(point.y - self.startpoint.y, point.x - self.startpoint.x))
+            point.setDegree(degree)
+        
+        self.points = sorted(self.points, key = lambda point: point.degree)
+        self.points.insert(0, self.startpoint)
+        
+        # make points order--------------------------------------------
+        for index in range(points_num.get()):
+            point = self.points[index]
+            plt.text(point.x+35, point.y-25, str(index+1))
+        canvas.draw()
+ 
     def update(self, i):
         pass
     
     def frames(self):
-        pass
+        for i in range(1, points_num.get()):
+            yield i
 
 window = tk.Tk()
 window.geometry("750x650")
