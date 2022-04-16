@@ -3,10 +3,11 @@ Created on Tue Nov 24 22:02:29 2020
 
 @author: Mu-Ping
 """
-
+import math
 import matplotlib.pyplot as plt
 import numpy as np
 import tkinter as tk
+
 from tkinter import ttk 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib import animation
@@ -17,16 +18,18 @@ class PointNode():
         self.x = x
         self.y = y
         
-    def setAngle(self, x, y, angle):
-        self.angle = angle
+    def setDegree(self, degree):
+        self.degree = degree
         
 class Graham_scan():
     
     def __init__(self):
-        self.points = []
-        self.plot = []
+        self.startpoint = None
+        self.points = []  # all pooints except startpoint
         
     def gen_data(self):
+        
+        # set plot
         plt.clf()
         plt.title("Data Distribution", fontsize=28)
         plt.xlabel('x asix', fontsize=20)
@@ -34,12 +37,35 @@ class Graham_scan():
         plt.xlim(-1200, 1200)
         plt.ylim(-1200, 1200)
         
-        for _ in range(points_num.get()): # 點數
-            center_x = np.random.randint(-600, 600)
-            center_y = np.random.randint(-600, 600)
-            self.points.append(PointNode(center_x, center_y))
-            plt.plot(center_x, center_y, 'o', ms=5 , color = 'gray', alpha=1) # 畫圖 ms：折點大小
-           
+        # generate points--------------------------------------------
+        tempPoints = []
+        tempY = 600
+        
+        for _ in range(points_num.get()): # number of points
+            centerX = np.random.randint(-1000, 1000)
+            centerY = np.random.randint(-1000, 1000)
+            point = PointNode(centerX, centerY)
+            
+            if centerY <= tempY:
+                tempY = centerY
+                self.startpoint = point
+                
+            tempPoints.append(point)   
+        tempPoints.remove(self.startpoint)    
+        
+        # count degree and sort by angle------------------------
+        for point in tempPoints:
+            degree = math.degrees(math.atan2(point.y - self.startpoint.y, point.x - self.startpoint.x))
+            point.setDegree(degree)
+        
+        self.points = sorted(tempPoints, key = lambda point: point.degree)
+        self.points.insert(0, self.startpoint)
+        
+        # make plot--------------------------------------------
+        for index in range(len(self.points)):
+            point = self.points[index]
+            plt.plot(point.x, point.y, 'o', ms=5 , color = '#1f77b4', alpha=1) # ms: point size        
+            plt.text(point.x+35, point.y-20, str(index+1))
         canvas.draw()
         
         
@@ -49,9 +75,12 @@ class Graham_scan():
         
     def init(self): 
         pass
-    def update(self, i): # 2維資料更新參數
+ 
+        
+    def update(self, i):
         pass
-    def frames(self): # 禎數生成器
+    
+    def frames(self):
         pass
 
 window = tk.Tk()
@@ -61,7 +90,7 @@ window.title("Graham-scan Algorithm ")
 window.configure(bg='#E6E6FA')
 
 # Global var
-points_num = tk.IntVar()#群
+points_num = tk.IntVar()
 points_num.set(15)
 
 # tk Frame
