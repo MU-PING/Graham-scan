@@ -26,9 +26,6 @@ class PointNode():
         
     def setPlot(self, plot):
         self.plot = plot
-    
-    def resetColor(self):
-        self.plot.set_color("#1f77b4")
         
     def beSelected(self):
         self.plot.set_color("#ff7f0e")
