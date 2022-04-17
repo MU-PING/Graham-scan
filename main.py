@@ -126,7 +126,8 @@ class Graham_scan():
             point.beProcessed()
             segment = self.segment_stack.pop()
             segment.remove()
-            self.vector_stack.pop()
+            vector = self.vector_stack.pop()
+            vector.delete()
             
             firstPoint = self.points_stack[-1]
             vectorX = self.vector_stack[-1]
