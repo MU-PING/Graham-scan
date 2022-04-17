@@ -3,6 +3,7 @@ Created on Tue Nov 24 22:02:29 2020
 
 @author: Mu-Ping
 """
+import sys
 import math
 import matplotlib.pyplot as plt
 import numpy as np
@@ -25,15 +26,34 @@ class PointNode():
         
     def setPlot(self, plot):
         self.plot = plot
+    
+    def resetColor(self):
+        self.plot.set_color("#1f77b4")
         
+    def beSelected(self):
+        self.plot.set_color("#ff7f0e")
+        
+    def beProcessed(self):
+        self.plot.set_color("#d62728")
+            
 class Graham_scan():
     
     def __init__(self):
-        self.startpoint = None
-        self.points = None
-        self.stack = [] # record convex hull points
+        self.firstPoint = None
+        self.points = []
+        self.points_stack = [] 
+        self.segment_stack = [] 
+        self.vector_stack = []  
+        
+    def resetStructure(self):
+        self.points.clear()
+        self.points_stack.clear()
+        self.segment_stack.clear()
+        self.vector_stack.clear()
         
     def gen_data(self):
+        
+        self.resetStructure()
         
         # set plot
         plt.clf()
@@ -45,7 +65,6 @@ class Graham_scan():
         
         # generate points--------------------------------------------
         tempY = 600
-        self.points = []
         for _ in range(points_num.get()): # number of points
             centerX = np.random.randint(-1000, 1000)
             centerY = np.random.randint(-1000, 1000)
@@ -53,41 +72,79 @@ class Graham_scan():
             
             if centerY <= tempY:
                 tempY = centerY
-                self.startpoint = point
+                self.firstPoint = point
                 
             self.points.append(point)   
         
         # make points--------------------------------------------
-        self.stack = [plt.plot(point.x, point.y, 'o', ms=5 , color = '#1f77b4', alpha=1)]
-        for index in range(points_num.get()):
-            point = self.points[index]
-            plt.plot(point.x, point.y, 'o', ms=5 , color = '#1f77b4', alpha=1) # ms: point size        
+        for point in self.points:
+            point.setPlot(plt.plot(point.x, point.y, 'o', ms=5 , color = '#1f77b4', alpha=1)[0]) # ms: point size        
         canvas.draw()
         
     def start(self):   
         ani = animation.FuncAnimation(fig=fig, func=self.update, frames=self.frames, init_func = self.init, interval=1200, blit=False, repeat=False) #動畫
+        
         canvas.draw()
         
     def init(self): 
-        
+
         # calculate degree and sort by degree------------------------
-        self.points.remove(self.startpoint)  
+        self.points.remove(self.firstPoint)  
+        
         for point in self.points:
-            degree = math.degrees(math.atan2(point.y - self.startpoint.y, point.x - self.startpoint.x))
+            degree = math.degrees(math.atan2(point.y - self.firstPoint.y, point.x - self.firstPoint.x))
             point.setDegree(degree)
         
         self.points = sorted(self.points, key = lambda point: point.degree)
-        self.points.insert(0, self.startpoint)
         
         # make points order--------------------------------------------
-        for index in range(points_num.get()):
+        plt.text(self.firstPoint.x+35, self.firstPoint.y-25, "1")
+        for index in range(points_num.get()-1):
             point = self.points[index]
-            plt.text(point.x+35, point.y-25, str(index+1))
+            plt.text(point.x+35, point.y-25, str(index+2))
+
+        self.points.append(self.firstPoint)  
+        
+        # init stack--------------------------------------------
+        secondPoint = self.points[0]
+        self.firstPoint.beSelected()
+        secondPoint.beSelected()
+        self.points_stack.append(self.firstPoint)
+        self.points_stack.append(secondPoint)
+        self.segment_stack.append(plt.plot([self.firstPoint.x, secondPoint.x], [self.firstPoint.y, secondPoint.y], color = '#ff7f0e', alpha=1, linestyle="solid")[0])
+        self.vector_stack.append(np.array([secondPoint.x - self.firstPoint.x, secondPoint.y - self.firstPoint.y]))
+        
         canvas.draw()
- 
+        
     def update(self, i):
-        pass
-    
+        firstPoint = self.points_stack[-1]
+        secondPoint = self.points[i]
+        
+        # decide wheather clockwise
+        vectorX = self.vector_stack[-1]
+        vectorY = np.array([secondPoint.x - firstPoint.x, secondPoint.y - firstPoint.y])
+            
+        while(np.cross(vectorX, vectorY) < 0):        # clockwise
+            point = self.points_stack.pop()
+            point.beProcessed()
+            segment = self.segment_stack.pop()
+            segment.remove()
+            self.vector_stack.pop()
+            
+            firstPoint = self.points_stack[-1]
+            vectorX = self.vector_stack[-1]
+            vectorY = np.array([secondPoint.x - firstPoint.x, secondPoint.y - firstPoint.y])
+            
+        if(np.cross(vectorX, vectorY) > 0):           # counter-clockwise
+            secondPoint.beSelected()
+            self.points_stack.append(secondPoint)
+            self.segment_stack.append(plt.plot([firstPoint.x, secondPoint.x], [firstPoint.y, secondPoint.y], color = '#ff7f0e', alpha=1, linestyle="solid")[0])
+            self.vector_stack.append(np.array([secondPoint.x - firstPoint.x, secondPoint.y - firstPoint.y]))
+        
+
+        if(i == points_num.get()-1): # last step
+            plt.plot([firstPoint.x, secondPoint.x], [firstPoint.y, secondPoint.y], color = '#ff7f0e', alpha=1, linestyle="solid")
+            
     def frames(self):
         for i in range(1, points_num.get()):
             yield i
