@@ -137,10 +137,6 @@ class Graham_scan():
             self.points_stack.append(secondPoint)
             self.segment_stack.append(plt.plot([firstPoint.x, secondPoint.x], [firstPoint.y, secondPoint.y], color = '#ff7f0e', alpha=1, linestyle="solid")[0])
             self.vector_stack.append(np.array([secondPoint.x - firstPoint.x, secondPoint.y - firstPoint.y]))
-        
-
-        if(i == points_num.get()-1): # last step
-            plt.plot([firstPoint.x, secondPoint.x], [firstPoint.y, secondPoint.y], color = '#ff7f0e', alpha=1, linestyle="solid")
             
     def frames(self):
         for i in range(1, points_num.get()):
