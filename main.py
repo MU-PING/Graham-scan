@@ -117,9 +117,6 @@ class Graham_scan():
         canvas.draw()
         
     def update(self, i):
-        print(len(self.points_stack))
-        print(len(self.segment_stack))
-        print(len(self.vector_stack))
         firstPoint = self.points_stack[-1]
         secondPoint = self.points[i]
         
