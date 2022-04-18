@@ -50,17 +50,18 @@ class Graham_scan():
         self.segment_stack.clear()
         self.vector_stack.clear()
         
-    def gen_data(self):
-        
-        self.clearPoints()
-        
-        # set plot
+    def clearPlot(self):
         plt.clf()
         plt.title("Data Distribution", fontsize=28)
         plt.xlabel('x asix', fontsize=20)
         plt.ylabel('y asix', fontsize=20)
         plt.xlim(-1200, 1200)
         plt.ylim(-1200, 1200)
+            
+    def gen_data(self):
+        
+        self.clearPoints()
+        self.clearPlot()
         
         # generate points--------------------------------------------
         tempY = 600
@@ -147,14 +148,7 @@ class Graham_scan():
         self.ani.event_source.stop()
         
         self.clearStructure()
-        
-        # set plot
-        plt.clf()
-        plt.title("Data Distribution", fontsize=28)
-        plt.xlabel('x asix', fontsize=20)
-        plt.ylabel('y asix', fontsize=20)
-        plt.xlim(-1200, 1200)
-        plt.ylim(-1200, 1200)
+        self.clearPlot()
         
         # make points--------------------------------------------
         for point in self.points:
