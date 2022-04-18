@@ -69,16 +69,13 @@ class Graham_scan():
             centerX = np.random.randint(-1000, 1000)
             centerY = np.random.randint(-1000, 1000)
             point = PointNode(centerX, centerY)
+            point.setPlot(plt.plot(point.x, point.y, 'o', ms=5 , color = '#1f77b4', alpha=1)[0]) # ms: point size   
             
             if centerY <= tempY:
                 tempY = centerY
                 self.firstPoint = point
                 
             self.points.append(point)   
-        
-        # make points--------------------------------------------
-        for point in self.points:
-            point.setPlot(plt.plot(point.x, point.y, 'o', ms=5 , color = '#1f77b4', alpha=1)[0]) # ms: point size   
             
         canvas.draw()
         
@@ -97,7 +94,7 @@ class Graham_scan():
         
         self.points = sorted(self.points, key = lambda point: point.degree)
         
-        # make points order--------------------------------------------
+        # label points order--------------------------------------------
         plt.text(self.firstPoint.x+35, self.firstPoint.y-25, "1")
         for index in range(points_num.get()-1):
             point = self.points[index]
