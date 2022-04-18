@@ -41,16 +41,19 @@ class Graham_scan():
         self.points_stack = [] 
         self.segment_stack = [] 
         self.vector_stack = []  
+        self.ani =None
         
-    def resetStructure(self):
+    def clearPoints(self):
         self.points.clear()
+
+    def clearStructure(self):
         self.points_stack.clear()
         self.segment_stack.clear()
         self.vector_stack.clear()
         
     def gen_data(self):
         
-        self.resetStructure()
+        self.clearPoints()
         
         # set plot
         plt.clf()
@@ -75,12 +78,12 @@ class Graham_scan():
         
         # make points--------------------------------------------
         for point in self.points:
-            point.setPlot(plt.plot(point.x, point.y, 'o', ms=5 , color = '#1f77b4', alpha=1)[0]) # ms: point size        
+            point.setPlot(plt.plot(point.x, point.y, 'o', ms=5 , color = '#1f77b4', alpha=1)[0]) # ms: point size   
+            
         canvas.draw()
         
     def start(self):   
-        ani = animation.FuncAnimation(fig=fig, func=self.update, frames=self.frames, init_func = self.init, interval=1200, blit=False, repeat=False) #動畫
-        
+        self.ani = animation.FuncAnimation(fig=fig, func=self.update, frames=self.frames, init_func = self.init, interval=1200, blit=False, repeat=False) #動畫
         canvas.draw()
         
     def init(self): 
@@ -114,6 +117,9 @@ class Graham_scan():
         canvas.draw()
         
     def update(self, i):
+        print(len(self.points_stack))
+        print(len(self.segment_stack))
+        print(len(self.vector_stack))
         firstPoint = self.points_stack[-1]
         secondPoint = self.points[i]
         
@@ -127,7 +133,7 @@ class Graham_scan():
             segment = self.segment_stack.pop()
             segment.remove()
             vector = self.vector_stack.pop()
-            vector.delete()
+            vector = None # release memory
             
             firstPoint = self.points_stack[-1]
             vectorX = self.vector_stack[-1]
@@ -143,6 +149,33 @@ class Graham_scan():
         for i in range(1, points_num.get()):
             yield i
 
+    def stop(self):
+        # stop animation
+        self.ani.event_source.stop()
+        
+        self.clearStructure()
+        
+        # set plot
+        plt.clf()
+        plt.title("Data Distribution", fontsize=28)
+        plt.xlabel('x asix', fontsize=20)
+        plt.ylabel('y asix', fontsize=20)
+        plt.xlim(-1200, 1200)
+        plt.ylim(-1200, 1200)
+        
+        # make points--------------------------------------------
+        for point in self.points:
+            point.setPlot(plt.plot(point.x, point.y, 'o', ms=5 , color = '#1f77b4', alpha=1)[0]) # ms: point size
+            
+        canvas.draw()
+        
+# disable Buttom & Entry
+def disable(component):
+    component['state'] = 'disable'
+
+def enable(component):
+    component['state'] = 'normal'
+    
 window = tk.Tk()
 window.geometry("750x650")
 window.resizable(False, False)
@@ -162,8 +195,7 @@ setting2 = tk.Frame(window)
 setting2.pack(side='top', pady=10)
 
 # Plot
-fig = plt.figure(figsize=(8,8))
-
+fig = plt.figure(figsize=(9, 8))
 canvas = FigureCanvasTkAgg(fig, setting2)  # A tk.DrawingArea.
 canvas.get_tk_widget().grid()
 
@@ -173,10 +205,14 @@ brain.gen_data()
 
 # GUI
 tk.Label(setting1, font=("Calibri", 15, "bold"), text="Number of points:", bg="#F0FFF0").pack(side='left', padx=5)
-tk.Entry(setting1, width=5, textvariable=points_num).pack(side='left')
-btn = tk.Button(setting1, font=("Calibri", 12, "bold"), text='Generate points', command = brain.gen_data)
-btn.pack(side='left', padx=(10, 5), pady=5)
-btn = tk.Button(setting1, font=("Calibri", 12, "bold"), text='Start finding convex hull', command = brain.start)
-btn.pack(side='left', padx=(5, 10), pady=5)
+ent = tk.Entry(setting1, width=5, textvariable=points_num)
+ent.pack(side='left')
+btn1 = tk.Button(setting1, font=("Calibri", 12, "bold"), text='Generate points', command=lambda:[brain.gen_data()])
+btn1.pack(side='left', padx=(10, 5), pady=5)
+btn2 = tk.Button(setting1, font=("Calibri", 12, "bold"), text='Start finding convex hull', command=lambda:[brain.start(), disable(btn1), disable(btn2), disable(ent),  enable(btn3)])
+btn2.pack(side='left', padx=(5, 10), pady=5)
+btn3 = tk.Button(setting1, font=("Calibri", 12, "bold"), text='Reset', command=lambda:[brain.stop(), enable(btn1), enable(btn2), enable(ent), disable(btn3)])
+btn3.pack(side='left', padx=(5, 10), pady=5)
+btn3['state'] = 'disable'
 
 window.mainloop()
