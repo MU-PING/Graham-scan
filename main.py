@@ -3,7 +3,6 @@ Created on Tue Nov 24 22:02:29 2020
 
 @author: Mu-Ping
 """
-import sys
 import math
 import matplotlib.pyplot as plt
 import numpy as np
